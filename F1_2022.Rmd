@@ -1,0 +1,58 @@
+---
+title: "F1 Analysis"
+author: "Brian Schauf"
+date: "2022-12-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+
+
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r tables}
+# circuit <- read.csv("circuits.csv", TRUE)
+# races <- read.csv("races.csv", TRUE)
+# results <- read.csv("results.csv", TRUE)
+# lap_time <- read.csv("lap_times.csv", TRUE)
+# driver <- read.csv("drivers.csv", TRUE)
+
+
+lap_time_hist <- lap_time %>% 
+  filter(milliseconds <365000 & milliseconds >60000 & driverId==1)
+
+lap_data <- left_join(lap_time,races,by = 'raceId')
+lap_data <- lap_data[,1:7]
+lap_data <- left_join(lap_data,driver, by='driverId')
+lap_data <- lap_data[,1:10]
+
+ #filter(driverId == 1 | driverId == 4 | driverId == 20 | driverId == 822 | driverId==815 | driverId==832 | driverId == 830 | driverId == 844) %>% 
+
+lap_story <- lap_data %>%
+  filter(driverId %in% c(1,4,20,822,815,832,830,844) ) %>% 
+  group_by(driverRef, year) %>% 
+  summarize(mean=mean(milliseconds))
+ 
+
+  
+
+# hist(lap_time_hist$milliseconds, breaks = 1000)
+# hist_info <- hist(lap_time_hist$milliseconds, breaks = 1000, plot = FALSE)
+# hist_info
+
+lap_story
+
+ggplot(lap_story, aes(x=year, y=mean, color = driverRef))+
+  geom_line()
+
+```
+
